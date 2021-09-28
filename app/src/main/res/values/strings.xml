@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Recyclerview Example</string>
+    <string name="product_text">Product</string>
+    <string name="price_text">Price</string>
+</resources>
