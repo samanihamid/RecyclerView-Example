@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    public List<Product> mProducts = new ArrayList<>();
+    private List<Product> mProducts = new ArrayList<>();
     private ProductAdapter mAdapter;
     private RecyclerView mRecyclerView;
 
@@ -37,13 +37,12 @@ public class MainActivity extends AppCompatActivity {
         // Prepare data
         prepareProducts();
 
-        // Implement onClickListener for adapter
         ProductAdapter.ClickListener listener = new ProductAdapter.ClickListener() {
             @Override
-            public void onClick(View view, int productID) {
+            public void onProductClick(View view, int productID) {
                 final Product product = mProducts.get(productID);
-                // Display details for the selected recycler view row
-                Toast.makeText(getApplicationContext(),product.getName()+"\nPrice = "+product.getPrice(),Toast.LENGTH_SHORT).show();
+                // Display details for the selected RecyclerView item (product on the list)
+                Toast.makeText(getApplicationContext(), product.getName()+"\nPrice = $"+product.getPrice(), Toast.LENGTH_SHORT).show();
             }
         };
         // Instantiate adapter

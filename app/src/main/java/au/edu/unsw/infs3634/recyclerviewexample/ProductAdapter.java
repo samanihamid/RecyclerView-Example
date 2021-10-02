@@ -22,16 +22,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
         this.mListener = listener;
     }
 
-    // Allows clicks events to be caught
+    // Allows click events to be caught
     public interface ClickListener {
-        void onClick(View view, int productID);
+        void onProductClick(View view, int productID);
     }
 
     // Inflate the row layout from xml when needed (just the view, no data)
     @NonNull
     @Override
     public ProductAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row, parent, false);
         return new MyViewHolder(view, mListener);
     }
@@ -52,22 +51,22 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
         return mProducts.size();
     }
 
-    // Create view holder. The view holder has two text view elements and a listener to catch click events
-    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public TextView name, price;
+    // Create view holder. The view holder has two text view elements
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private TextView name, price;
         private ClickListener listener;
 
         public MyViewHolder(@NonNull View itemView, ClickListener listener) {
             super(itemView);
             this.listener = listener;
-            itemView.setOnClickListener(this);
+            itemView.setOnClickListener(MyViewHolder.this);
             name = itemView.findViewById(R.id.tvName);
             price = itemView.findViewById(R.id.tvPrice);
         }
 
         @Override
         public void onClick(View v) {
-            listener.onClick(v, (Integer) v.getTag());
+            listener.onProductClick(v, (Integer) v.getTag());
         }
     }
 
