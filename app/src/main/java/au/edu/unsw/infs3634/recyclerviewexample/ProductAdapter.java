@@ -3,23 +3,60 @@ package au.edu.unsw.infs3634.recyclerviewexample;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 // Adapter class that connects data set to the recycler view
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHolder>{
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHolder> implements Filterable {
     private List<Product>  mProducts;
+    private List<Product> mProductsFiltered;
     private ClickListener mListener;
 
 //    Initialise the dataset of the Adapter
     ProductAdapter(List<Product> products, ClickListener listener){
         this.mProducts = products;
+        this.mProductsFiltered = products;
         this.mListener = listener;
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+                if(charString.isEmpty()) {
+                    mProductsFiltered = mProducts;
+                } else {
+                    ArrayList<Product> filteredList = new ArrayList<>();
+                    for(Product product : mProducts) {
+                        if(product.getName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(product);
+                        }
+                    }
+                    mProductsFiltered = filteredList;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mProductsFiltered;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                mProductsFiltered = (ArrayList<Product>) results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     // Allows click events to be caught
@@ -38,7 +75,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
     // Bind the data to the TextView elements in each row
     @Override
     public void onBindViewHolder(@NonNull ProductAdapter.MyViewHolder holder, int position) {
-        final Product product = mProducts.get(position);
+        final Product product = mProductsFiltered.get(position);
         int productID = position;
         holder.name.setText(product.getName());
         holder.price.setText("Price: $"+String.valueOf(product.getPrice()));
@@ -48,7 +85,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
     // Total number of rows in the list
     @Override
     public int getItemCount() {
-        return mProducts.size();
+        return mProductsFiltered.size();
     }
 
     // Create view holder. The view holder has two text view elements
@@ -68,6 +105,23 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
         public void onClick(View v) {
             listener.onProductClick(v, (Integer) v.getTag());
         }
+    }
+
+    // Sort method
+    public void sort(final int sortMethod) {
+        if(mProductsFiltered.size() > 0) {
+            Collections.sort(mProductsFiltered, new Comparator<Product>() {
+                @Override
+                public int compare(Product o1, Product o2) {
+                    if(sortMethod == 1) {
+                        return o1.getName().compareTo(o2.getName());
+                    } else if(sortMethod == 2)
+                        return String.valueOf(o1.getPrice()).compareTo(String.valueOf(o2.getPrice()));
+                    return o1.getName().compareTo(o2.getName());
+                }
+            });
+        }
+        notifyDataSetChanged();
     }
 
 }
